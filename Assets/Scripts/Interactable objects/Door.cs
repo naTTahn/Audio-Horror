@@ -8,6 +8,9 @@ public class Door : Interactable
     //public MeshRenderer meshRenderer;
     public Material highlightMaterial;
     public Material transparentMaterial;
+    private bool doorOpen;
+    public GameObject door;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +19,11 @@ public class Door : Interactable
     protected override void Interact()
     {
         base.Interact();
-        Debug.Log("Interact with" + gameObject.name);
+        //Debug.Log("Interact with " + gameObject.name);
+        doorOpen = door.GetComponent<Animator>().GetBool("isOpen");
+        doorOpen = !doorOpen;
+        Debug.Log("Door is " + doorOpen);
+        door.GetComponent<Animator>().SetBool("isOpen", doorOpen);
     }
     private void FixedUpdate()
     {

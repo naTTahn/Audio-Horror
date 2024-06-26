@@ -10,12 +10,13 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField]
     LayerMask mask;
     private PlayerUI playerUI;
-    private Interactable interactable;
+    private InputManager inputManager;
     // Start is called before the first frame update
     void Start()
     {
         cam = GetComponent<PlayerLook>().cam;
         playerUI = GetComponent<PlayerUI>();
+        inputManager = GetComponent<InputManager>();
     }
 
     // Update is called once per frame
@@ -28,8 +29,13 @@ public class PlayerInteract : MonoBehaviour
         {
             if(hitInfo.collider.GetComponent<Interactable>() != null)
             {
+                Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
                 hitInfo.collider.GetComponent<Interactable>().onRaycasted();
-                playerUI.UpdateText(hitInfo.collider.GetComponent<Interactable>().promptMessage);//get info from objects that collided with the ray, in this case promptMessage from Interactable 
+                playerUI.UpdateText(interactable.promptMessage);//get info from objects that collided with the ray, in this case promptMessage from Interactable 
+                if (inputManager.onFoot.Interact.triggered)
+                {
+                    interactable.baseInteract();
+                }
             }
         }
         
