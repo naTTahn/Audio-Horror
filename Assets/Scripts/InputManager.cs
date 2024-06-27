@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using Player;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputManager : MonoBehaviour
 {
-    private PlayerInput playerInput;
-    public PlayerInput.OnFootActions onFoot;
-    private PlayerMovement movement;
-    private PlayerLook look;
+    private PlayerInput _playerInput;
+    public PlayerInput.OnFootActions OnFoot;
+    private PlayerMovement _movement;
+    private PlayerLook _look;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,35 +17,35 @@ public class InputManager : MonoBehaviour
     }
     void Awake()
     {
-        playerInput = new PlayerInput();
-        onFoot = playerInput.OnFoot;
-        movement = GetComponent<PlayerMovement>();
-        onFoot.Jump.performed += ctx => movement.Jump();
+        _playerInput = new PlayerInput();
+        OnFoot = _playerInput.OnFoot;
+        _movement = GetComponent<PlayerMovement>();
+        OnFoot.Jump.performed += ctx => _movement.Jump();
 
-        onFoot.Sprint.started += ctx => movement.startSprint();
-        onFoot.Sprint.canceled += ctx => movement.stopSprint();
-
-        
+        OnFoot.Sprint.started += ctx => _movement.StartSprint();
+        OnFoot.Sprint.canceled += ctx => _movement.StopSprint();
 
         
-        look = GetComponent<PlayerLook>();
+
+        
+        _look = GetComponent<PlayerLook>();
     }
     // Update is called once per frame
     void FixedUpdate()
     {
-        movement.ProcessMove(onFoot.Movements.ReadValue<Vector2>()); //read the vector 2 value on the player's keyboard and translate it into character's movement using ProcessMove(vector2) over in PlayerMovement
+        _movement.ProcessMove(OnFoot.Movements.ReadValue<Vector2>()); //read the vector 2 value on the player's keyboard and translate it into character's movement using ProcessMove(vector2) over in PlayerMovement
     }
     private void LateUpdate()
     {
-        look.ProcessLook(onFoot.Look.ReadValue<Vector2>());
+        _look.ProcessLook(OnFoot.Look.ReadValue<Vector2>());
 
     }
     private void OnEnable()
     {
-        onFoot.Enable();
+        OnFoot.Enable();
     }
     private void OnDisable()
     {
-        onFoot.Disable();
+        OnFoot.Disable();
     }
 }

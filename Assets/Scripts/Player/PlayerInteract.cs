@@ -1,43 +1,61 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class PlayerInteract : MonoBehaviour
+namespace Player
 {
-    private Camera cam;
-    [SerializeField]
-    private float distance = 3f;
-    [SerializeField]
-    LayerMask mask;
-    private PlayerUI playerUI;
-    private InputManager inputManager;
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerInteract : MonoBehaviour
     {
-        cam = GetComponent<PlayerLook>().cam;
-        playerUI = GetComponent<PlayerUI>();
-        inputManager = GetComponent<InputManager>();
-    }
+        private Camera _cam;
 
-    // Update is called once per frame
-    void Update()
-    {
-        playerUI.UpdateText(string.Empty);
-        Ray ray = new Ray(cam.transform.position, cam.transform.forward);
-        RaycastHit hitInfo;
-        if(Physics.Raycast(ray, out hitInfo, distance, mask))
+        [FormerlySerializedAs("distance")] [SerializeField]
+        private float interactionDistance = 3f;
+
+        [FormerlySerializedAs("mask")] [SerializeField]
+        private LayerMask interactionMask;
+
+        private PlayerUI _playerUI;
+        private InputManager _inputManager;
+
+        // Start is called before the first frame update
+        private void Awake()
         {
-            Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
-            if(interactable)
+            _cam = GetComponent<PlayerLook>().cam;
+            _playerUI = GetComponent<PlayerUI>();
+            _inputManager = GetComponent<InputManager>();
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            HandleInteraction();
+        }
+
+        private void HandleInteraction()
+        {
+            _playerUI.UpdateText(string.Empty);
+
+            if (!TryGetInteractable(out Interactable interactable)) return; // Step tf out of this fukin function.
+
+            interactable.OnRaycasted();
+            _playerUI.UpdateText(interactable.promptMessage);
+
+            if (_inputManager.OnFoot.Interact.triggered)
             {
-                interactable.onRaycasted();
-                playerUI.UpdateText(interactable.promptMessage);//get info from objects that collided with the ray, in this case promptMessage from Interactable 
-                if (inputManager.onFoot.Interact.triggered)
-                {
-                    interactable.baseInteract();
-                }
+                interactable.BaseInteract();
             }
         }
-        
+
+        private bool TryGetInteractable(out Interactable interactable)
+        {
+            Ray ray = new Ray(_cam.transform.position, _cam.transform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, interactionDistance, interactionMask))
+            {
+                interactable = hitInfo.collider.GetComponent<Interactable>();
+                return interactable is not null;
+            }
+
+            interactable = null;
+            return false;
+        }
     }
 }

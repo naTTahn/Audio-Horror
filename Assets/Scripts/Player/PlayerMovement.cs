@@ -1,63 +1,75 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class PlayerMovement : MonoBehaviour
+namespace Player
 {
-    private CharacterController controller;
-    private Vector3 playerVelocity;
-    public bool isGrounded;
-    public float speed = 5f;
-    public bool Sprinting;
+    public class PlayerMovement : MonoBehaviour
+    {
+        private const float DefaultSpeed = 5f;
+        private const float SprintSpeed = 10f;
+        private const float Gravity = -20f;
+        private const float TerminalVelocity = -30f;
+        private const float JumpVelocity = 1.4f;
 
-    public float gravity = -20f;
-    public float terminalVelocity = -30f;
-    public float jumpVelocity = 1.4f;
-    // Start is called before the first frame update
-    void Start()
-    {
-        controller = GetComponent <CharacterController>();
-    }
+        private CharacterController _controller;
+        private Vector3 _playerVelocity;
+        public bool isGrounded;
+        public float speed = DefaultSpeed;
+        [FormerlySerializedAs("Sprinting")] public bool sprinting;
 
-    // Update is called once per frame
-    void Update()
-    {
-        isGrounded = controller.isGrounded;
-    }
-    public void ProcessMove(Vector2 input)
-    {
-        Vector3 moveDirection = Vector3.zero;
-        moveDirection.x = input.x;
-        moveDirection.z = input.y;
-        controller.Move(transform.TransformDirection(moveDirection) * (speed * Time.deltaTime));
-        if (!isGrounded)
+        void Start()
         {
-            playerVelocity.y += gravity * Time.deltaTime; // apply gravity if the player is not grounded
-            if (playerVelocity.y < terminalVelocity)
-            {
-                playerVelocity.y = terminalVelocity; //make the player not fall too fast
-            }
+            _controller = GetComponent<CharacterController>();
         }
 
-        controller.Move(playerVelocity * Time.deltaTime);
-        //Debug.Log(playerVelocity.y);
-    }
-    
-    public void startSprint()
-    {
-        if (isGrounded)
-            speed = 10f;
-    }
-    public void stopSprint()
-    {
-            speed = 5f;
-    }
-    
-    public void Jump()
-    {
-        if (isGrounded)
+        void Update()
         {
-            playerVelocity.y = Mathf.Sqrt(jumpVelocity * -3.0f * gravity); 
+            isGrounded = _controller.isGrounded;
+        }
+
+        public void ProcessMove(Vector2 input)
+        {
+            Vector3 moveDirection = new Vector3(input.x, 0, input.y);
+            MovePlayer(moveDirection);
+            ApplyGravity();
+        }
+
+        private void MovePlayer(Vector3 direction)
+        {
+            _controller.Move(transform.TransformDirection(direction) * (speed * Time.deltaTime));
+        }
+
+        private void ApplyGravity()
+        {
+            if (!isGrounded)
+            {
+                _playerVelocity.y += Gravity * Time.deltaTime; // apply gravity if the player is not grounded
+                if (_playerVelocity.y < TerminalVelocity)
+                {
+                    _playerVelocity.y = TerminalVelocity; //make the player not fall too fast
+                }
+            }
+
+            _controller.Move(_playerVelocity * Time.deltaTime);
+        }
+
+        public void StartSprint()
+        {
+            if (isGrounded)
+                speed = SprintSpeed;
+        }
+
+        public void StopSprint()
+        {
+            speed = DefaultSpeed;
+        }
+
+        public void Jump()
+        {
+            if (isGrounded)
+            {
+                _playerVelocity.y = Mathf.Sqrt(JumpVelocity * -3.0f * Gravity);
+            }
         }
     }
 }

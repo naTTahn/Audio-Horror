@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Interactable : MonoBehaviour
 {
     public string promptMessage;
-    public void baseInteract()
+    public void BaseInteract()
     {
         Interact();
     }
@@ -13,13 +13,13 @@ public abstract class Interactable : MonoBehaviour
     {
         //this is the base where Interactable item script will overwrite
     }
-    protected virtual void onHover()
+    protected virtual void OnHover()
     {
         //this is the base where Interactable item script will overwrite
     }
-    public void onRaycasted()
+    public void OnRaycasted()
     {
-        onHover();
+        OnHover();
     }
 
 }
