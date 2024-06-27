@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDirection = Vector3.zero;
         moveDirection.x = input.x;
         moveDirection.z = input.y;
-        controller.Move(transform.TransformDirection(moveDirection) * speed * Time.deltaTime);
+        controller.Move(transform.TransformDirection(moveDirection) * (speed * Time.deltaTime));
         if (!isGrounded)
         {
             playerVelocity.y += gravity * Time.deltaTime; // apply gravity if the player is not grounded

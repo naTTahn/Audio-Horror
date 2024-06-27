@@ -27,10 +27,10 @@ public class PlayerInteract : MonoBehaviour
         RaycastHit hitInfo;
         if(Physics.Raycast(ray, out hitInfo, distance, mask))
         {
-            if(hitInfo.collider.GetComponent<Interactable>() != null)
+            Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
+            if(interactable)
             {
-                Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
-                hitInfo.collider.GetComponent<Interactable>().onRaycasted();
+                interactable.onRaycasted();
                 playerUI.UpdateText(interactable.promptMessage);//get info from objects that collided with the ray, in this case promptMessage from Interactable 
                 if (inputManager.onFoot.Interact.triggered)
                 {
